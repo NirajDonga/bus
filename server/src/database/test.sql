@@ -54,5 +54,5 @@ INSERT INTO trips (
 );
 
 -- 5. Create a Dummy User (So you can test booking)
-INSERT INTO users (email, phone, password) VALUES 
-('test@user.com', '9876543210', 'hashed_password_here');
+INSERT INTO users (fullname, email, phone, password) VALUES 
+('Test User', 'test@user.com', '9876543210', 'hashed_password_here');

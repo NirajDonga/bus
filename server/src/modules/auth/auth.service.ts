@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import { AuthRepository } from "./auth.repo.js"
 import Jwt from "jsonwebtoken";
 
-
 export class AuthService {
 
     private authRepo = new AuthRepository();
@@ -32,14 +31,15 @@ export class AuthService {
         }
 
         const token = Jwt.sign(
-            { id: user.id, role: user.role, name: user.fullname },
+            { id: user.id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
+        const { password: _, ...safeUser } = user;
 
-        return { user, token };
+        return { user: safeUser, token };
     }
 
-
+       
 
 }

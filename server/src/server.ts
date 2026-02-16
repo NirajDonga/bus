@@ -1,22 +1,20 @@
-import console from "node:console";
-import pool from "./config/db.js";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import appRouter from './routes/index.js';
+
+dotenv.config();
+
+const app = express();
 
 
-async function test() {
+app.use(cors());
+app.use(express.json());
 
-    try {
-        console.log("Connecting to Postgres...");
+app.use('/api', appRouter);
 
-        const res = await pool.query('SELECT NOW() as current_time');
+const PORT = process.env.PORT || 3000;
 
-        console.log('Connection Successful');
-        console.log('Time:', res.rows[0].current_time);
-    } catch (err) {
-        console.log("Connection Failed");
-    } finally {
-        await pool.end();
-    }
-
-}
-
-test()
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
