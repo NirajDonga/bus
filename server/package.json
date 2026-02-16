@@ -7,27 +7,37 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "migrate:up": "node-pg-migrate up -m src/database/migrations -j sql --envPath .env",
+    "migrate:down": "node-pg-migrate down -m src/database/migrations -j sql --envPath .env",
+    "migrate:create": "node-pg-migrate create -m src/database/migrations -j sql --envPath .env",
+    "seed": "tsx src/database/seed.ts",
+    "migrate:reset": "node-pg-migrate down --count 100 -m src/database/migrations -j sql --envPath .env"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.3",
     "@types/pg": "^8.16.0",
     "@types/redis": "^4.0.11",
+    "node-pg-migrate": "^8.0.4",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0",
     "redis": "^5.10.0"
   }
