@@ -1,4 +1,4 @@
-import pool from "../../config/db.js";
+import pool from "../../config/postgres.js";
 import { UserPublic, UserLogin } from "./auth.schema.js";
 
 export class AuthRepository {

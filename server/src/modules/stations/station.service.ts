@@ -1,9 +1,9 @@
-import { StationRepo } from "./station.repo.js";
+import { StationRepository } from "./station.repo.js";
 
 
 export class StationService {
 
-    private stationRepo = new StationRepo();
+    private stationRepo = new StationRepository();
 
 
     createStation = async (name: string, city: string, state: string, latitude?: number, longitude?: number) => {

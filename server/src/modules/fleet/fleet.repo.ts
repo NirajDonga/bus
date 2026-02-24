@@ -1,4 +1,4 @@
-import pool from "../../config/db.js";
+import pool from "../../config/postgres.js";
 import type { LayoutBody } from "./fleet.schema.js";
 
 export class FleetRepository {

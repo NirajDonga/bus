@@ -1,7 +1,7 @@
-import pool from "../../config/db.js";
+import pool from "../../config/postgres.js";
 
 
-export class StationRepo {
+export class StationRepository {
 
     createStation = async (name: string, city: string, state: string, latitude?: number, longitude?: number) => {
         const query = `

@@ -1,12 +1,12 @@
 import { TripRepository } from "./trip.repo.js";
 import { FleetRepository } from "../fleet/fleet.repo.js";
-import { StationRepo } from "../stations/station.repo.js";
+import { StationRepository } from "../stations/station.repo.js";
 import type { CreateTripBody, UpdateTripBody } from "./trip.schema.js";
 
 export class TripService {
     private tripRepo = new TripRepository();
     private fleetRepo = new FleetRepository();
-    private stationRepo = new StationRepo();
+    private stationRepo = new StationRepository();
 
     createTrip = async (data: CreateTripBody) => {
         // Validation: Verify Bus exists and grab available seats
