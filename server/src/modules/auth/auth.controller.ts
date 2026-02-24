@@ -39,4 +39,44 @@ export class AuthController {
         }
     }
 
+    getMe = async (req: Request, res: Response) => {
+        try {
+            const user = await this.authService.getMe(req.user!.id);
+            res.status(200).json(user);
+        } catch (error: any) {
+            res.status(404).json({ message: error.message });
+        }
+    }
+
+    getUsers = async (req: Request, res: Response) => {
+        try {
+            const users = await this.authService.getUsers();
+            res.status(200).json(users);
+        } catch (error: any) {
+            res.status(500).json({ message: "Failed to fetch users" });
+        }
+    }
+
+    getUserById = async (req: Request, res: Response) => {
+        const id = Number(req.params.id);
+        if (isNaN(id)) { res.status(400).json({ message: "Invalid user ID" }); return; }
+        try {
+            const user = await this.authService.getUserById(id);
+            res.status(200).json(user);
+        } catch (error: any) {
+            res.status(404).json({ message: error.message });
+        }
+    }
+
+    deleteUser = async (req: Request, res: Response) => {
+        const id = Number(req.params.id);
+        if (isNaN(id)) { res.status(400).json({ message: "Invalid user ID" }); return; }
+        try {
+            await this.authService.deleteUser(id);
+            res.status(200).json({ message: `User ${id} deleted` });
+        } catch (error: any) {
+            res.status(error.message.includes("not found") ? 404 : 500).json({ message: error.message });
+        }
+    }
+
 }

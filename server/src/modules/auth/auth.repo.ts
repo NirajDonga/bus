@@ -34,4 +34,16 @@ export class AuthRepository {
         return result.rows[0];
     }
 
+    getAllUsers = async (): Promise<UserPublic[]> => {
+        const query = `SELECT id, fullname, email, phone, role FROM users ORDER BY id`;
+        const result = await pool.query(query);
+        return result.rows;
+    }
+
+    deleteUser = async (userId: number): Promise<{ id: number } | undefined> => {
+        const query = `DELETE FROM users WHERE id = $1 RETURNING id`;
+        const result = await pool.query(query, [userId]);
+        return result.rows[0];
+    }
+
 }

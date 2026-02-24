@@ -40,6 +40,26 @@ export class AuthService {
         return { user: safeUser, token };
     }
 
-       
+    getMe = async (userId: number) => {
+        const user = await this.authRepo.findById(userId);
+        if (!user) throw new Error("User not found");
+        return user;
+    }
+
+    getUsers = async () => {
+        return await this.authRepo.getAllUsers();
+    }
+
+    getUserById = async (userId: number) => {
+        const user = await this.authRepo.findById(userId);
+        if (!user) throw new Error(`User with ID ${userId} not found`);
+        return user;
+    }
+
+    deleteUser = async (userId: number) => {
+        const user = await this.authRepo.findById(userId);
+        if (!user) throw new Error(`User with ID ${userId} not found`);
+        return await this.authRepo.deleteUser(userId);
+    }
 
 }
