@@ -1,9 +1,8 @@
 import pool from "../../config/db.js";
-import { User, UserPublic, UserLogin } from "./auth.types.js";
+import { UserPublic, UserLogin } from "./auth.schema.js";
 
 export class AuthRepository {
-    // check if any info about user exists?
-    findExistingUser = async (email: string, phone: string): Promise<Pick<User, 'id'> | undefined> => {
+    findExistingUser = async (email: string, phone: string): Promise<{ id: number } | undefined> => {
         const query = 'SELECT id FROM users WHERE email = $1 OR phone = $2';
         const result = await pool.query(query, [email, phone]);
         return result.rows[0];
@@ -19,7 +18,6 @@ export class AuthRepository {
         return result.rows[0];
     }
 
-    // for login purpose    
     findByEmail = async (email: string): Promise<UserLogin | undefined> => {
         const query = 'SELECT id, fullname, email, password, role FROM users WHERE email = $1';
         const result = await pool.query(query, [email]);

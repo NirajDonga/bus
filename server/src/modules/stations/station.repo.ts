@@ -3,13 +3,13 @@ import pool from "../../config/db.js";
 
 export class StationRepo {
 
-    createStation = async (name: string, city: string, state: string) => {
+    createStation = async (name: string, city: string, state: string, latitude?: number, longitude?: number) => {
         const query = `
-            INSERT INTO stations (name, city, state)
-            VALUES ($1, $2, $3)
+            INSERT INTO stations (name, city, state, latitude, longitude)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *
         `;
-        const result = await pool.query(query, [name, city, state]);
+        const result = await pool.query(query, [name, city, state, latitude ?? null, longitude ?? null]);
         return result.rows[0];
     }
 
