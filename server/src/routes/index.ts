@@ -11,6 +11,6 @@ router.use("/auth", authRoutes);
 router.use("/stations", stationRoutes);
 router.use("/fleet", fleetRoutes);
 router.use("/trips", tripRoutes);
-router.use("search", searchRoutes);
+router.use("/search", searchRoutes);
 
 export default router;
