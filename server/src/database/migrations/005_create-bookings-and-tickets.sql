@@ -20,10 +20,11 @@ CREATE TABLE tickets (
     passenger_name VARCHAR(100),
     passenger_age INT,
     passenger_gender VARCHAR(10),
+    board_seq INT NOT NULL,
+    drop_seq INT NOT NULL,
     price_paid DECIMAL(10, 2) NOT NULL,
     status VARCHAR(20) DEFAULT 'confirmed', 
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE (trip_id, seat_number) 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_bookings_user_id ON bookings(user_id);

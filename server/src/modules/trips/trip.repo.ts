@@ -84,7 +84,6 @@ export class TripRepository {
             values.push(JSON.stringify(data.schedule));
         }
 
-        // Always update the updated_at timestamp
         updates.push(`updated_at = NOW()`);
 
         values.push(id);
