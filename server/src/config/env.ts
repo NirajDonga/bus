@@ -4,6 +4,7 @@ const EnvSchema = z.object({
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
     JWT_SECRET: z.string().min(16, "JWT_SECRET must be at least 16 characters"),
     PORT: z.string().regex(/^\d+$/, "PORT must be a number").optional(),
+    REDIS_URL: z.string().min(1, "REDIS_URL is required"),
 });
 
 const parsed = EnvSchema.safeParse(process.env);

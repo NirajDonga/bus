@@ -6,7 +6,7 @@ import appRouter from './routes/index.js';
 import { testElasticConnection } from './config/elastic.js';
 import { createTripsIndex } from './config/elastic-setup.js';
 import { startElasticSyncWorker } from "./workers/elastic-sync.worker.js";
-
+import { connectRedis } from "./config/redis.js";
 dotenv.config();
 
 const app = express();
@@ -24,4 +24,5 @@ app.listen(PORT, async () => {
     await testElasticConnection();
     await createTripsIndex();
     await startElasticSyncWorker();
+    await connectRedis();
 });
