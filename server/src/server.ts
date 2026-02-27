@@ -1,4 +1,4 @@
-import "./config/env.js"; // ← validates all env vars at startup, exits if invalid
+import "./config/env.js"; 
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
