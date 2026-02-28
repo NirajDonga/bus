@@ -8,7 +8,7 @@ const CHECKOUT_TTL = 600;   // 10 min — while user is on payment page
 
 export class InventoryService {
 
-    async getSeatMap(tripId: number, boardingStationId: number, droppingStationId: number) {
+    getSeatMap = async (tripId: number, boardingStationId: number, droppingStationId: number) => {
         const tripData = await inventoryRepo.getTripData(tripId);
         if (!tripData) return null;
 
@@ -44,14 +44,23 @@ export class InventoryService {
         return { layout: tripData.layout, seats };
     }
 
-    async getSeatLock(key: string) {
+    getSeatLock = async (key: string) => {
         const lockData = await redisClient.get(key);
         return lockData ? JSON.parse(lockData) : null;
     }
 
-    async setSeatLock(key: string, ttl: number, data: { userId: number, boardSeq: number, dropSeq: number }) {
+    setSeatLock = async (key: string, ttl: number, data: { userId: number, boardSeq: number, dropSeq: number }) => {
         await redisClient.setEx(key, ttl, JSON.stringify(data));
     }
+
+    releaseSeatLocks = async (tripId: number, seatNumbers: string[]) => {
+        const pipeline = redisClient.multi();
+        for (const seat of seatNumbers) {
+            pipeline.del(lockKey(tripId, seat));
+        }
+        await pipeline.exec();
+    }
+
 }
 
 export const inventoryService = new InventoryService();

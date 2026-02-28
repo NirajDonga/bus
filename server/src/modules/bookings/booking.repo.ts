@@ -69,6 +69,11 @@ export class BookingRepository {
         return result.rows[0];
     }
 
+    async getTicketsForBooking(bookingId: number) {
+        const result = await pool.query(`SELECT * FROM tickets WHERE booking_id = $1`, [bookingId]);
+        return result.rows;
+    }
+
     async updateBookingStatus(bookingId: number, status: string, paymentId?: string) {
         const query = `
             UPDATE bookings 

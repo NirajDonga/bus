@@ -1,4 +1,4 @@
-import "./config/env.js"; 
+import "./config/env.js";
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -6,6 +6,7 @@ import appRouter from './routes/index.js';
 import { testElasticConnection } from './config/elastic.js';
 import { createTripsIndex } from './config/elastic-setup.js';
 import { startElasticSyncWorker } from "./workers/elastic-sync.worker.js";
+import { startAbandonedBookingWorker } from "./workers/abandoned-booking.worker.js";
 import { connectRedis } from "./config/redis.js";
 dotenv.config();
 
@@ -25,4 +26,5 @@ app.listen(PORT, async () => {
     await createTripsIndex();
     await startElasticSyncWorker();
     await connectRedis();
+    startAbandonedBookingWorker();
 });

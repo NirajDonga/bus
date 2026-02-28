@@ -1,5 +1,6 @@
 import { stripe } from "../../config/stripe.js"
 import { bookingRepo } from '../bookings/booking.repo.js';
+import { inventoryService } from '../inventory/inventory.service.js';
 
 export class PaymentService {
     handleCreateCheckoutSession = async (bookingId: number) => {
@@ -61,8 +62,17 @@ export class PaymentService {
                 const bookingId = Number(session.metadata?.bookingId);
 
                 if (bookingId) {
+                    const booking = await bookingRepo.getBookingById(bookingId);
+
+                    if (booking) {
+                        const tickets = await bookingRepo.getTicketsForBooking(bookingId);
+                        const seatNumbers = tickets.map((t: any) => t.seat_number);
+
+                        await inventoryService.releaseSeatLocks(booking.trip_id, seatNumbers);
+                    }
+
                     await bookingRepo.updateBookingStatus(bookingId, 'cancelled');
-                    console.log(`Checkout expired for booking ID: ${bookingId}. Status updated to 'cancelled'.`);
+                    console.log(`Checkout expired for booking ID: ${bookingId}. Status updated to 'cancelled' and seats released.`);
                 }
                 break;
             }
