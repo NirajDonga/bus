@@ -1,6 +1,7 @@
 import { TripRepository } from "./trip.repo.js";
 import { FleetRepository } from "../fleet/fleet.repo.js";
 import { StationRepository } from "../stations/station.repo.js";
+import pool from "../../config/postgres.js";
 import type { CreateTripBody, UpdateTripBody } from "./trip.schema.js";
 
 export class TripService {
@@ -23,6 +24,17 @@ export class TripService {
             throw new Error(`Bus ${bus.plate_number} is already scheduled for another trip during this time block.`);
         }
 
+        // Validation: Ensure schedule cumulative pricing is correct
+        if (data.schedule[0].price !== 0) {
+            throw new Error(`The price for the very first stop in the schedule must be exactly 0.`);
+        }
+
+        for (let i = 1; i < data.schedule.length; i++) {
+            if (data.schedule[i].price < data.schedule[i - 1].price) {
+                throw new Error(`Schedule prices must be cumulative and non-decreasing. Stop sequence ${i + 1} cannot have a lower cumulative price than stop sequence ${i}.`);
+            }
+        }
+
         // Auto-assign available_seats to the exact total capacity of the bus's layout
         const fullData = {
             ...data,
@@ -43,7 +55,10 @@ export class TripService {
     }
 
     updateTrip = async (id: number, data: UpdateTripBody) => {
-        const trip = await this.tripRepo.getTripById(id);
+        // Fetch raw pg trip for validation
+        const query = `SELECT * FROM trips WHERE id = $1`;
+        const result = await pool.query(query, [id]);
+        const trip = result.rows[0];
         if (!trip) throw new Error(`Trip with ID ${id} not found`);
 
         // If time changes and status is not cancelled, re-check double booking
@@ -61,12 +76,26 @@ export class TripService {
             }
         }
 
+        // Validation: Ensure schedule cumulative pricing is correct when updating
+        if (data.schedule) {
+            if (data.schedule[0].price !== 0) {
+                throw new Error(`The price for the very first stop in the schedule must be exactly 0.`);
+            }
+
+            for (let i = 1; i < data.schedule.length; i++) {
+                if (data.schedule[i].price < data.schedule[i - 1].price) {
+                    throw new Error(`Schedule prices must be cumulative and non-decreasing. Stop sequence ${i + 1} cannot have a lower cumulative price than stop sequence ${i}.`);
+                }
+            }
+        }
+
         return await this.tripRepo.updateTrip(id, data);
     }
 
     deleteTrip = async (id: number) => {
-        const trip = await this.tripRepo.getTripById(id);
-        if (!trip) throw new Error(`Trip with ID ${id} not found`);
+        const query = `SELECT * FROM trips WHERE id = $1`;
+        const result = await pool.query(query, [id]);
+        if (result.rows.length === 0) throw new Error(`Trip with ID ${id} not found`);
         return await this.tripRepo.deleteTrip(id);
     }
 }

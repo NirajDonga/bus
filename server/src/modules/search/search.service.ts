@@ -6,16 +6,18 @@ export class SearchService {
     searchTrips = async (fromCity: string, toCity: string, date: string, page: number, limit: number) => {
         const rawTrips = await this.searchRepo.findTripsByRouteAndDate(fromCity, toCity, date, page, limit);
 
-        const forwardTrips = rawTrips.filter(trip => {
-            const boardingPoint = trip.schedule.find((s: any) => s.station_city.toLowerCase() === fromCity.toLowerCase());
-            const droppingPoint = trip.schedule.find((s: any) => s.station_city.toLowerCase() === toCity.toLowerCase());
+        // Enhance response by pulling the specific route info out for the frontend
+        return rawTrips.map(trip => {
+            const routeInfo = trip.routes?.find((r: any) =>
+                r.from_city.toLowerCase() === fromCity.toLowerCase() &&
+                r.to_city.toLowerCase() === toCity.toLowerCase()
+            );
 
-            if (!boardingPoint || !droppingPoint) return false;
-
-            return boardingPoint.sequence < droppingPoint.sequence;
+            return {
+                ...trip,
+                search_route: routeInfo
+            };
         });
-
-        return forwardTrips;
     }
 }
 

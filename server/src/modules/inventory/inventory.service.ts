@@ -1,46 +1,56 @@
 import { redisClient } from "../../config/redis.js";
 import { inventoryRepo } from "./inventory.repo.js";
 
+const lockKey = (tripId: number, seat: string) => `lock:trip:${tripId}:seat:${seat}`;
+
+const SELECTION_TTL = 300;  // 5 min — while user is selecting seats
+const CHECKOUT_TTL = 600;   // 10 min — while user is on payment page
+
 export class InventoryService {
-    private key = (tripId: number) => `inventory:${tripId}`;
 
-    async getInventory(tripId: number) {
-        const key = this.key(tripId);
-        let seats = await redisClient.hGetAll(key);
+    async getSeatMap(tripId: number, boardingStationId: number, droppingStationId: number) {
+        const tripData = await inventoryRepo.getTripData(tripId);
+        if (!tripData) return null;
 
-        if (Object.keys(seats).length === 0) {
-            const layout = await inventoryRepo.getTripLayout(tripId);
-            if (!layout) return null;
+        const schedule: any[] = tripData.schedule;
+        const boardSeq = schedule.findIndex(s => s.stop_id === boardingStationId);
+        const dropSeq = schedule.findIndex(s => s.stop_id === droppingStationId);
 
-            const bookedSeats = await inventoryRepo.getBookedSeats(tripId);
-            const allSeats: string[] = layout.layout.flat().filter(Boolean);
+        if (boardSeq === -1 || dropSeq === -1 || boardSeq >= dropSeq) return null;
 
-            const fields: Record<string, string> = {};
-            for (const seat of allSeats) {
-                fields[seat] = bookedSeats.includes(seat) ? "booked" : "available";
+        const bookedSeats = await inventoryRepo.getBookedSeatsForSegment(tripId, boardSeq, dropSeq);
+        const allSeats: string[] = tripData.layout.flat().filter(Boolean);
+
+        const seats: Record<string, "available" | "locked" | "booked"> = {};
+
+        for (const seat of allSeats) {
+            if (bookedSeats.includes(seat)) {
+                seats[seat] = "booked";
+                continue;
             }
 
-            await redisClient.hSet(key, fields);
-            seats = fields;
+            const lockData = await redisClient.get(lockKey(tripId, seat));
+            if (lockData) {
+                const lock = JSON.parse(lockData);
+                if (lock.boardSeq < dropSeq && lock.dropSeq > boardSeq) {
+                    seats[seat] = "locked";
+                    continue;
+                }
+            }
+
+            seats[seat] = "available";
         }
 
-        return seats;
+        return { layout: tripData.layout, seats };
     }
 
-    async seedInventory(tripId: number, seatNumbers: string[]) {
-        const fields: Record<string, string> = {};
-        for (const seat of seatNumbers) {
-            fields[seat] = "available";
-        }
-        await redisClient.hSet(this.key(tripId), fields);
+    async getSeatLock(key: string) {
+        const lockData = await redisClient.get(key);
+        return lockData ? JSON.parse(lockData) : null;
     }
 
-    async updateSeats(tripId: number, seatNumbers: string[], status: "available" | "locked" | "booked") {
-        const fields: Record<string, string> = {};
-        for (const seat of seatNumbers) {
-            fields[seat] = status;
-        }
-        await redisClient.hSet(this.key(tripId), fields);
+    async setSeatLock(key: string, ttl: number, data: { userId: number, boardSeq: number, dropSeq: number }) {
+        await redisClient.setEx(key, ttl, JSON.stringify(data));
     }
 }
 

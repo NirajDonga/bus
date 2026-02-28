@@ -1,5 +1,6 @@
 import pool from "../../config/postgres.js";
 import { CreateTripBody, UpdateTripBody } from "./trip.schema.js";
+import { elasticClient } from "../../config/elastic.js";
 
 export class TripRepository {
 
@@ -45,21 +46,17 @@ export class TripRepository {
     }
 
     getTripById = async (id: number) => {
-        const query = `
-            SELECT 
-                t.*, 
-                b.plate_number, 
-                b.operator_name,
-                s1.city AS first_stop_city,
-                s2.city AS last_stop_city
-            FROM trips t
-            JOIN buses b ON t.bus_id = b.id
-            JOIN stations s1 ON t.first_stop = s1.id
-            JOIN stations s2 ON t.last_stop = s2.id
-            WHERE t.id = $1
-        `;
-        const result = await pool.query(query, [id]);
-        return result.rows[0];
+        try {
+            const response = await elasticClient.get({
+                index: "trips",
+                id: String(id)
+            });
+            return response._source;
+        } catch (error: any) {
+            // Elastic throws a 404 if the document isn't found
+            if (error.meta?.statusCode === 404) return null;
+            throw error;
+        }
     }
 
     updateTrip = async (id: number, data: UpdateTripBody) => {

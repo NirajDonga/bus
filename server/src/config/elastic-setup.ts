@@ -30,10 +30,20 @@ export async function createTripsIndex() {
                         properties: {
                             stop_id: { type: "integer" },
                             station_name: { type: "text" },
-                            station_city: { type: "keyword" }, // Keyword for exact matching
-                            arrival: { type: "keyword" },      // e.g. "10:00"
-                            departure: { type: "keyword" },    // e.g. "10:15"
-                            sequence: { type: "integer" }      // guarantees traveling forward
+                            station_city: { type: "keyword" },
+                            arrival: { type: "keyword" },
+                            departure: { type: "keyword" },
+                            sequence: { type: "integer" }
+                        }
+                    },
+
+                    routes: {
+                        type: "nested",
+                        properties: {
+                            from_city: { type: "keyword" },
+                            to_city: { type: "keyword" },
+                            available_seats: { type: "integer" },
+                            price: { type: "float" }
                         }
                     }
                 }

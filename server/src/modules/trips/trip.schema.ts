@@ -4,6 +4,7 @@ export const ScheduleItemSchema = z.object({
     stop_id: z.number().int().positive(),
     arrival: z.string().regex(/^\d{2}:\d{2}$/, "Must be HH:mm format (e.g., 10:00)"),
     departure: z.string().regex(/^\d{2}:\d{2}$/, "Must be HH:mm format (e.g., 10:15)"),
+    price: z.number().min(0, "Price must be 0 or more (0 for the first stop)"),
 });
 
 export const CreateTripSchema = z.object({

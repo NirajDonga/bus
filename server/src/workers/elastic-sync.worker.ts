@@ -1,15 +1,17 @@
 import { elasticClient } from "../config/elastic.js";
 import pool from "../config/postgres.js";
 
-const syncTripToElastic = async (tripId: number) => {
+export const syncTripToElastic = async (tripId: number) => {
     try {
         const query = `
             SELECT 
                 t.*, 
                 b.plate_number, 
-                b.operator_name
+                b.operator_name,
+                bl.total_seats
             FROM trips t
             JOIN buses b ON t.bus_id = b.id
+            JOIN bus_layouts bl ON b.layout_id = bl.id
             WHERE t.id = $1
         `;
         const result = await pool.query(query, [tripId]);
@@ -20,6 +22,7 @@ const syncTripToElastic = async (tripId: number) => {
         }
 
         const pgTrip = result.rows[0];
+        const totalSeats = pgTrip.total_seats;
 
         const stopIds = pgTrip.schedule.map((s: any) => s.stop_id);
         const stationsQuery = `SELECT id, name, city FROM stations WHERE id = ANY($1)`;
@@ -27,14 +30,58 @@ const syncTripToElastic = async (tripId: number) => {
 
         const enrichedSchedule = pgTrip.schedule.map((stop: any, index: number) => {
             const station = stations.find(s => s.id === stop.stop_id) || { name: "Unknown", city: "Unknown" };
+            const { price, ...restStop } = stop;
 
             return {
-                ...stop,
+                ...restStop,
                 station_name: station.name,
                 station_city: station.city,
                 sequence: index + 1
             };
         });
+
+        // 1. Get all tickets for this trip
+        const ticketsQuery = `
+            SELECT board_seq, drop_seq 
+            FROM tickets 
+            WHERE trip_id = $1 AND status IN ('confirmed', 'pending')
+        `;
+        const { rows: tickets } = await pool.query(ticketsQuery, [tripId]);
+
+        // 2. Compute available seats per physical leg
+        const numberOfLegs = enrichedSchedule.length - 1;
+        const legAvailability: number[] = new Array(numberOfLegs).fill(totalSeats);
+
+        for (const ticket of tickets) {
+            for (let i = ticket.board_seq - 1; i < ticket.drop_seq - 1; i++) {
+                if (i >= 0 && i < legAvailability.length) {
+                    legAvailability[i]--;
+                }
+            }
+        }
+
+        // 3. Generate all combinations, calculate seats and price
+        const routes: any[] = [];
+        for (let i = 0; i < enrichedSchedule.length - 1; i++) {
+            for (let j = i + 1; j < enrichedSchedule.length; j++) {
+                let minSeats = totalSeats;
+                for (let leg = i; leg < j; leg++) {
+                    if (legAvailability[leg] < minSeats) {
+                        minSeats = legAvailability[leg];
+                    }
+                }
+
+                // Price is difference in cumulative prices
+                const basePrice = pgTrip.schedule[j].price - pgTrip.schedule[i].price;
+
+                routes.push({
+                    from_city: enrichedSchedule[i].station_city,
+                    to_city: enrichedSchedule[j].station_city,
+                    available_seats: minSeats,
+                    price: basePrice
+                });
+            }
+        }
 
         const elasticDocument = {
             id: pgTrip.id,
@@ -44,8 +91,10 @@ const syncTripToElastic = async (tripId: number) => {
                 plate_number: pgTrip.plate_number,
                 operator_name: pgTrip.operator_name
             },
-            schedule: enrichedSchedule
+            schedule: enrichedSchedule,
+            routes: routes
         };
+
         await elasticClient.index({
             index: "trips",
             id: String(pgTrip.id),

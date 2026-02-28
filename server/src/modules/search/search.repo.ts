@@ -20,14 +20,16 @@ export class SearchRepository {
                         },
                         {
                             nested: {
-                                path: "schedule",
-                                query: { match: { "schedule.station_city": fromCity } }
-                            }
-                        },
-                        {
-                            nested: {
-                                path: "schedule",
-                                query: { match: { "schedule.station_city": toCity } }
+                                path: "routes",
+                                query: {
+                                    bool: {
+                                        must: [
+                                            { match: { "routes.from_city": fromCity } },
+                                            { match: { "routes.to_city": toCity } },
+                                            { range: { "routes.available_seats": { gt: 0 } } }
+                                        ]
+                                    }
+                                }
                             }
                         }
                     ]

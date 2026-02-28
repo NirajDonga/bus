@@ -46,10 +46,13 @@ export class BookingRepository {
                         ticket.boardSeq,
                         ticket.dropSeq,
                         ticket.pricePaid,
-                        'pending' 
+                        'pending'
                     ]
                 );
             }
+
+            // Bump trip updated_at to trigger the Postgres LISTEN/NOTIFY for Elasticsearch sync worker
+            await client.query(`UPDATE trips SET updated_at = NOW() WHERE id = $1`, [data.tripId]);
 
             await client.query('COMMIT');
             return booking;
@@ -74,7 +77,13 @@ export class BookingRepository {
             [status, bookingId]
         );
 
-        return result.rows[0];
+        // Notify Elasticsearch sync worker by updating the trip
+        const booking = result.rows[0];
+        if (booking && booking.trip_id) {
+            await pool.query(`UPDATE trips SET updated_at = NOW() WHERE id = $1`, [booking.trip_id]);
+        }
+
+        return booking;
     }
 }
 
