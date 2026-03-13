@@ -1,12 +1,33 @@
 import bcrypt from "bcrypt";
 import { AuthRepository } from "./auth.repo.js"
 import Jwt from "jsonwebtoken";
+import dns from "dns";
+import { promisify } from "util";
+
+const resolveMx = promisify(dns.resolveMx);
+
+async function isDomainValid(email: string) {
+    const domain = email.split('@')[1];
+    if (!domain) return false;
+    try {
+        const mxRecords = await resolveMx(domain);
+        return mxRecords && mxRecords.length > 0;
+    } catch (err) {
+        return false;
+    }
+}
 
 export class AuthService {
 
     private authRepo = new AuthRepository();
 
     RegisterUser = async (email: string, phone: string, fullname: string, password: string) => {
+        // Validate email domain has MX records
+        const domainValid = await isDomainValid(email);
+        if (!domainValid) {
+            throw new Error(`Invalid email domain: ${email.split('@')[1]} cannot receive emails.`);
+        }
+
         const exists = await this.authRepo.findExistingUser(email, phone);
         if (exists) {
             throw new Error('email or phone number already registered');

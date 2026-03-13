@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/server.js",
     "migrate:up": "node-pg-migrate up -m src/database/migrations -j sql --envPath .env",
     "migrate:down": "node-pg-migrate down -m src/database/migrations -j sql --envPath .env",
     "migrate:create": "node-pg-migrate create -m src/database/migrations -j sql --envPath .env",
@@ -33,7 +33,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^9.3.2",
+    "@elastic/elasticsearch": "^8.17.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
