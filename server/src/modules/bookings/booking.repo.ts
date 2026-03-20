@@ -51,7 +51,7 @@ export class BookingRepository {
                 );
             }
 
-            // Bump trip updated_at to trigger the Postgres LISTEN/NOTIFY for Elasticsearch sync worker
+            // Bump trip updated_at for auditing
             await client.query(`UPDATE trips SET updated_at = NOW() WHERE id = $1`, [data.tripId]);
 
             await client.query('COMMIT');
@@ -87,7 +87,7 @@ export class BookingRepository {
             [status, bookingId]
         );
 
-        // Notify Elasticsearch sync worker by updating the trip
+        // Bump trip updated_at for auditing
         const booking = result.rows[0];
         if (booking && booking.trip_id) {
             await pool.query(`UPDATE trips SET updated_at = NOW() WHERE id = $1`, [booking.trip_id]);

@@ -18,23 +18,6 @@ services:
     ports:
       - "6379:6379"
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
-    container_name: bus_elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms256m -Xmx256m
-    ports:
-      - "9200:9200"
-    volumes:
-      - elastic_data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   server:
     build: ./server
     container_name: bus_server
@@ -43,14 +26,11 @@ services:
         condition: service_started
       redis:
         condition: service_started
-      elasticsearch:
-        condition: service_healthy
     env_file:
       - ./server/.env
     environment:
       DATABASE_URL: postgres://bususer:buspass@postgres:5432/bus_db
       REDIS_URL: redis://redis:6379
-      ELASTIC_URL: http://elasticsearch:9200
     ports:
       - "3000:3000"
     volumes:
@@ -58,4 +38,3 @@ services:
 
 volumes:
   postgres_data:
-  elastic_data:

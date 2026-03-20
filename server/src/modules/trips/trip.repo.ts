@@ -1,6 +1,8 @@
 import pool from "../../config/postgres.js";
 import { CreateTripBody, UpdateTripBody } from "./trip.schema.js";
-import { elasticClient } from "../../config/elastic.js";
+import { SearchRepository } from "../search/search.repo.js";
+
+const searchRepo = new SearchRepository();
 
 export class TripRepository {
 
@@ -46,17 +48,7 @@ export class TripRepository {
     }
 
     getTripById = async (id: number) => {
-        try {
-            const response = await elasticClient.get({
-                index: "trips",
-                id: String(id)
-            });
-            return response._source;
-        } catch (error: any) {
-            // Elastic throws a 404 if the document isn't found
-            if (error.meta?.statusCode === 404) return null;
-            throw error;
-        }
+        return await searchRepo.buildTripDocument(id);
     }
 
     updateTrip = async (id: number, data: UpdateTripBody) => {

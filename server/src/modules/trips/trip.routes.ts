@@ -9,7 +9,7 @@ router.post("/", adminOnly, tripController.createTrip);
 router.patch("/:id", adminOnly, tripController.updateTrip);
 router.delete("/:id", adminOnly, tripController.deleteTrip);
 
-// Public routes (though actual full-text search will happen via Elastic)
+// Public routes
 router.get("/", tripController.getAllTrips);
 router.get("/:id", tripController.getTripById);
 

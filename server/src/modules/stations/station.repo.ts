@@ -5,11 +5,11 @@ export class StationRepository {
 
     createStation = async (name: string, city: string, state: string, latitude?: number, longitude?: number) => {
         const query = `
-            INSERT INTO stations (name, city, state, latitude, longitude)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO stations (name, city, state)
+            VALUES ($1, $2, $3)
             RETURNING *
         `;
-        const result = await pool.query(query, [name, city, state, latitude ?? null, longitude ?? null]);
+        const result = await pool.query(query, [name, city, state]);
         return result.rows[0];
     }
 
