@@ -1,13 +1,16 @@
 import "../../../helpers/env.ts";
 import assert from "node:assert/strict";
-import { beforeEach, describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import { bookingRepo } from "../../../../src/modules/bookings/booking.repo.js";
 import { inventoryService } from "../../../../src/modules/inventory/inventory.service.js";
 import { stripe } from "../../../../src/config/stripe.js";
 import { paymentService } from "../../../../src/modules/payments/payment.service.js";
 
+const originalConsoleLog = console.log;
+
 describe("paymentService", () => {
     beforeEach(() => {
+        console.log = () => undefined;
         (bookingRepo as any).getBookingById = async () => ({
             id: 44,
             status: "pending",
@@ -17,6 +20,10 @@ describe("paymentService", () => {
         (bookingRepo as any).updateBookingStatus = async () => ({ id: 44 });
         (bookingRepo as any).getTicketsForBooking = async () => [{ seat_number: "1A" }, { seat_number: "1B" }];
         (inventoryService as any).releaseSeatLocks = async () => undefined;
+    });
+
+    afterEach(() => {
+        console.log = originalConsoleLog;
     });
 
     it("rejects missing bookings before creating checkout sessions", async () => {
