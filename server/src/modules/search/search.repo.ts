@@ -8,9 +8,9 @@ export class SearchRepository {
         const { rows: tripIds } = await pool.query(`
             SELECT DISTINCT t.id
             FROM trips t
-            JOIN buses b ON t.bus_id = b.id,
-                 jsonb_array_elements(t.schedule) WITH ORDINALITY AS from_stop(data, seq),
-                 jsonb_array_elements(t.schedule) WITH ORDINALITY AS to_stop(data, seq)
+            JOIN buses b ON t.bus_id = b.id
+            CROSS JOIN LATERAL jsonb_array_elements(t.schedule) WITH ORDINALITY AS from_stop(data, seq)
+            CROSS JOIN LATERAL jsonb_array_elements(t.schedule) WITH ORDINALITY AS to_stop(data, seq)
             JOIN stations s_from ON (from_stop.data->>'stop_id')::int = s_from.id
             JOIN stations s_to   ON (to_stop.data->>'stop_id')::int = s_to.id
             WHERE t.departure_time >= ($1 || 'T00:00:00')::timestamptz
