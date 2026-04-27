@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "test": "node --import tsx --test --test-isolation=none --test-concurrency=1 \"tests/**/*.test.ts\"",
     "build": "tsc",
     "start": "node dist/server.js",
     "migrate:up": "node-pg-migrate up -m src/database/migrations -j sql --envPath .env",
