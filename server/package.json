@@ -12,7 +12,7 @@
     "migrate:up": "node-pg-migrate up -m src/database/migrations -j sql --envPath .env",
     "migrate:down": "node-pg-migrate down -m src/database/migrations -j sql --envPath .env",
     "migrate:create": "node-pg-migrate create -m src/database/migrations -j sql --envPath .env",
-    "seed": "tsx src/database/seed.ts",
+    "seed": "tsx src/database/test/seed.ts",
     "migrate:reset": "node-pg-migrate down --count 100 -m src/database/migrations -j sql --envPath .env"
   },
   "keywords": [],

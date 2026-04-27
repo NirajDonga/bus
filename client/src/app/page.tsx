@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Bus, CalendarDays, MapPin, Shield, Clock, Star } from "lucide-react";
+import { ArrowRight, Bus, CalendarDays, MapPin, ShieldCheck, Sparkles, TicketCheck } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -19,114 +19,122 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-60px)]">
-      {/* Hero — Clean, whitish with a red accent strip */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-[1200px] mx-auto px-6 py-16 lg:py-24">
-          <div className="max-w-2xl">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
-              Book bus tickets <br />
-              <span className="text-[#D84E55]">with ease.</span>
-            </h1>
-            <p className="text-gray-500 text-base mt-4 max-w-md leading-relaxed">
-              India&apos;s No. 1 online bus ticket booking platform. Thousands of routes, instant confirmation.
-            </p>
+    <div className="min-h-[calc(100vh-64px)] bg-white">
+      <section className="page-shell grid gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-20">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm text-zinc-700">
+            <Sparkles className="size-3.5 text-zinc-950" />
+            Clean bus booking
           </div>
 
-          {/* Search Form */}
-          <form onSubmit={handleSearch} className="mt-10 bg-white border border-gray-200 rounded-xl p-1.5 flex flex-col lg:flex-row items-stretch gap-0 max-w-3xl shadow-sm">
-            {/* From */}
-            <div className="flex-1 flex items-center gap-3 px-4 py-3 border-b lg:border-b-0 lg:border-r border-gray-100">
-              <Bus className="w-4 h-4 text-gray-400 shrink-0" />
-              <div className="flex flex-col w-full">
-                <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">From</label>
+          <h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-tight text-zinc-950 sm:text-6xl lg:text-7xl">
+            Book buses without the clutter.
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-600">
+            Search routes, compare departures, choose seats, and complete payment in a calm black and white workspace.
+          </p>
+
+          <form onSubmit={handleSearch} className="surface mt-10 grid gap-0 overflow-hidden lg:grid-cols-[1fr_1fr_1fr_auto]">
+            <label className="flex min-h-20 items-center gap-3 border-b border-zinc-200 px-4 lg:border-b-0 lg:border-r">
+              <Bus className="size-5 text-zinc-500" />
+              <span className="min-w-0 flex-1">
+                <span className="label block">From</span>
                 <input
                   type="text"
                   value={from}
-                  onChange={e => setFrom(e.target.value)}
-                  placeholder="Enter city"
-                  className="w-full bg-transparent outline-none text-sm font-medium text-gray-900 placeholder:text-gray-300 mt-0.5"
+                  onChange={(e) => setFrom(e.target.value)}
+                  placeholder="Bengaluru"
+                  className="mt-1 w-full bg-transparent text-base font-medium text-zinc-950 outline-none placeholder:text-zinc-400"
                   required
                 />
-              </div>
-            </div>
+              </span>
+            </label>
 
-            {/* To */}
-            <div className="flex-1 flex items-center gap-3 px-4 py-3 border-b lg:border-b-0 lg:border-r border-gray-100">
-              <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
-              <div className="flex flex-col w-full">
-                <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">To</label>
+            <label className="flex min-h-20 items-center gap-3 border-b border-zinc-200 px-4 lg:border-b-0 lg:border-r">
+              <MapPin className="size-5 text-zinc-500" />
+              <span className="min-w-0 flex-1">
+                <span className="label block">To</span>
                 <input
                   type="text"
                   value={to}
-                  onChange={e => setTo(e.target.value)}
-                  placeholder="Enter city"
-                  className="w-full bg-transparent outline-none text-sm font-medium text-gray-900 placeholder:text-gray-300 mt-0.5"
+                  onChange={(e) => setTo(e.target.value)}
+                  placeholder="Mysuru"
+                  className="mt-1 w-full bg-transparent text-base font-medium text-zinc-950 outline-none placeholder:text-zinc-400"
                   required
                 />
-              </div>
-            </div>
+              </span>
+            </label>
 
-            {/* Date */}
-            <div className="flex-1 flex items-center gap-3 px-4 py-3 border-b lg:border-b-0 lg:border-r border-gray-100">
-              <CalendarDays className="w-4 h-4 text-gray-400 shrink-0" />
-              <div className="flex flex-col w-full">
-                <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Date of Journey</label>
+            <label className="flex min-h-20 items-center gap-3 border-b border-zinc-200 px-4 lg:border-b-0 lg:border-r">
+              <CalendarDays className="size-5 text-zinc-500" />
+              <span className="min-w-0 flex-1">
+                <span className="label block">Date</span>
                 <input
                   type="date"
                   value={date}
-                  onChange={e => setDate(e.target.value)}
-                  className="w-full bg-transparent outline-none text-sm font-medium text-gray-900 mt-0.5"
+                  onChange={(e) => setDate(e.target.value)}
+                  className="mt-1 w-full bg-transparent text-base font-medium text-zinc-950 outline-none"
                   required
                 />
-              </div>
-            </div>
+              </span>
+            </label>
 
-            {/* Search Button */}
-            <Button
-              type="submit"
-              className="bg-[#D84E55] hover:bg-[#c4444b] text-white rounded-lg lg:rounded-l-none lg:rounded-r-lg h-auto px-8 py-4 lg:py-0 text-sm font-semibold shrink-0 cursor-pointer"
-            >
-              Search
+            <Button type="submit" className="m-2 h-14 rounded-md px-6 text-base">
+              Search <ArrowRight className="size-4" />
             </Button>
           </form>
         </div>
-      </div>
 
-      {/* Features — clean grid */}
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl border border-gray-100 p-6">
-            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center mb-4">
-              <Shield className="w-5 h-5 text-[#D84E55]" />
+        <div className="surface overflow-hidden bg-zinc-950 text-white">
+          <div className="border-b border-white/10 px-6 py-5">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-zinc-300">Tonight&apos;s board</span>
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-950">Live</span>
             </div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">Safe & Secure</h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Book with confidence. Secure payments and verified bus operators across the country.
-            </p>
           </div>
-
-          <div className="bg-white rounded-xl border border-gray-100 p-6">
-            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center mb-4">
-              <Clock className="w-5 h-5 text-[#D84E55]" />
-            </div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">Instant Booking</h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Get your tickets confirmed instantly. No waiting, no hassle, just book and go.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl border border-gray-100 p-6">
-            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center mb-4">
-              <Star className="w-5 h-5 text-[#D84E55]" />
-            </div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">2000+ Operators</h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Choose from a wide range of premium bus operators and find the perfect ride.
-            </p>
+          <div className="divide-y divide-white/10">
+            {[
+              ["BLR", "MYS", "21:40", "Rs 520"],
+              ["BLR", "HYD", "22:15", "Rs 1,180"],
+              ["BLR", "CHN", "23:05", "Rs 940"],
+            ].map(([fromCode, toCode, time, price]) => (
+              <div key={`${fromCode}-${toCode}`} className="grid grid-cols-[1fr_auto] gap-5 px-6 py-6">
+                <div>
+                  <div className="flex items-center gap-3 text-2xl font-semibold tracking-tight">
+                    <span>{fromCode}</span>
+                    <span className="h-px w-8 bg-zinc-500" />
+                    <span>{toCode}</span>
+                  </div>
+                  <div className="mt-2 text-sm text-zinc-400">Departure {time}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold">{price}</div>
+                  <div className="mt-2 text-xs uppercase tracking-[0.18em] text-zinc-500">Onwards</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="border-t border-zinc-200 bg-zinc-50">
+        <div className="page-shell grid gap-4 py-10 md:grid-cols-3">
+          {[
+            [ShieldCheck, "Verified operators", "Routes and buses are kept direct, readable, and easy to compare."],
+            [TicketCheck, "Fast checkout", "Seat selection, passenger details, and payment flow stay focused."],
+            [Bus, "Simple route search", "A quiet interface for repeat booking without visual noise."],
+          ].map(([Icon, title, text]) => {
+            const LucideIcon = Icon as typeof ShieldCheck;
+            return (
+              <div key={title as string} className="surface p-5">
+                <LucideIcon className="size-5 text-zinc-950" />
+                <h3 className="mt-4 text-sm font-semibold text-zinc-950">{title as string}</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-600">{text as string}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
