@@ -286,6 +286,12 @@ function SeatSelectionContent({ tripId }: { tripId: string }) {
               <input type="email" placeholder="Email" className="field" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <input type="password" placeholder="Password" className="field" value={password} onChange={(e) => setPassword(e.target.value)} required />
               <Button type="submit" className="mt-1 h-10">Login and book</Button>
+              <Link
+                href={`/signup?redirect=${encodeURIComponent(`/trip/${tripId}?${searchParams.toString()}`)}`}
+                className="text-center text-sm font-medium text-zinc-950 transition-colors hover:underline"
+              >
+                Create account
+              </Link>
               <button type="button" onClick={() => setShowLogin(false)} className="text-sm text-zinc-500 transition-colors hover:text-zinc-950">
                 Cancel
               </button>

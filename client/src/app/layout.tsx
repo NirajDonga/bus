@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { BusFront, HeadphonesIcon, Ticket } from "lucide-react";
+import { BusFront, HeadphonesIcon, LogIn, Ticket, UserPlus } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -34,6 +34,14 @@ export default function RootLayout({
               <Link href="#" className="flex items-center gap-2 transition-colors hover:text-zinc-950">
                 <HeadphonesIcon className="size-4" />
                 Help
+              </Link>
+              <Link href="/login" className="flex items-center gap-2 transition-colors hover:text-zinc-950">
+                <LogIn className="size-4" />
+                Login
+              </Link>
+              <Link href="/signup" className="flex items-center gap-2 transition-colors hover:text-zinc-950">
+                <UserPlus className="size-4" />
+                Sign up
               </Link>
             </nav>
           </div>
